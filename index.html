@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>🍎 减法口算 · 差为一位数</title>
+  <title>🍎 减法口算 · 均匀一位数结果</title>
   <style>
     * {
       box-sizing: border-box;
@@ -422,7 +422,8 @@
     let questions = [];
     let currentIndex = 0;
     let correctCount = 0;
-    let quizActive = false;
+    let quizActive = false;         // 是否允许答题（重开后为true，但计时未开始）
+    let quizStarted = false;        // 是否已经开始计时（首次按键后）
     let quizFinished = false;
     let answeredCurrent = false;
     let currentInput = '';
@@ -433,20 +434,25 @@
     let questionTimeRecords = [];
     let toastTimer = null;
 
-    // 修改后的题目生成：两位数(11-19)减一位数(1-9)，差必须在1-9之间
+    // ---------- 优化后的题目生成：保证差为1-9且均匀分布 ----------
     function generateQuestion() {
-      const num1 = Math.floor(Math.random() * 9) + 11; // 11~19
-      // 计算可能的减数范围：要满足 num1 - num2 在 1~9，即 num2 ∈ [num1-9, num1-1] 且 num2 在1~9之间
-      const minNum2 = Math.max(1, num1 - 9);
-      const maxNum2 = Math.min(9, num1 - 1);
-      let num2;
-      if (minNum2 > maxNum2) {
-        // 如果没有符合条件的，回退到安全值（理论上11-19都应该有解，但以防万一）
-        num2 = Math.max(1, Math.min(9, num1 - 1));
-      } else {
-        num2 = Math.floor(Math.random() * (maxNum2 - minNum2 + 1)) + minNum2;
+      // 随机生成答案 1~9 (均匀)
+      const answer = Math.floor(Math.random() * 9) + 1;
+      // 随机减数 1~9
+      const num2 = Math.floor(Math.random() * 9) + 1;
+      // 计算被减数，保证在11~19之间
+      let num1 = answer + num2;
+      // 如果num1超出范围，则调整num2或重新生成（但概率上基本都在范围内，加个保险）
+      while (num1 < 11 || num1 > 19) {
+        // 重新随机答案和减数
+        const newAnswer = Math.floor(Math.random() * 9) + 1;
+        const newNum2 = Math.floor(Math.random() * 9) + 1;
+        num1 = newAnswer + newNum2;
+        if (num1 >= 11 && num1 <= 19) {
+          return { num1, num2: newNum2, answer: newAnswer };
+        }
       }
-      return { num1, num2, answer: num1 - num2 };
+      return { num1, num2, answer };
     }
 
     function generateSet(count = 10) {
@@ -490,13 +496,19 @@
     }
 
     function startTotalTimer() {
+      if (quizStarted) return; // 防止重复启动
       stopTotalTimer();
+      quizStarted = true;
       totalTimerInterval = setInterval(() => {
-        if (quizActive && !quizFinished) {
+        if (quizActive && !quizFinished && quizStarted) {
           totalSeconds++;
           updateTotalTimerUI();
         }
       }, 1000);
+      // 开始计时时，标记第一题开始时间（如果尚未标记）
+      if (!questionStartTime) {
+        markQuestionStart();
+      }
     }
 
     function markQuestionStart() {
@@ -520,6 +532,7 @@
     function finishQuizAndShowModal() {
       quizFinished = true;
       quizActive = false;
+      quizStarted = false;
       stopTotalTimer();
       
       const accuracy = (correctCount / 10) * 100;
@@ -548,7 +561,7 @@
         currentInput = '';
         refreshInputDisplay();
         displayQuestion();
-        markQuestionStart();
+        markQuestionStart();   // 新题目开始计时
         completionStat.textContent = `📋 已完成 ${currentIndex}/10 题`;
       }
     }
@@ -601,9 +614,11 @@
       correctCount = 0;
       quizFinished = false;
       quizActive = true;
+      quizStarted = false;       // 计时尚未开始，等待首次按键
       answeredCurrent = false;
       currentInput = '';
       questionTimeRecords = [];
+      questionStartTime = null;   // 开始时间将在首次按键时设定
       
       totalSeconds = 0;
       updateTotalTimerUI();
@@ -613,12 +628,19 @@
       refreshInputDisplay();
       completionStat.textContent = `📋 进行中 · 0/10`;
       
-      markQuestionStart();
-      startTotalTimer();
+      // 不启动计时器，等待第一次按键
     }
 
+    // 处理数字输入，如果是首次输入则启动计时
     function appendDigit(digit) {
       if (!quizActive || quizFinished || answeredCurrent) return;
+      
+      // 首次按键启动计时
+      if (!quizStarted) {
+        startTotalTimer();
+        markQuestionStart(); // 记录本题开始时间
+      }
+      
       if (currentInput.length >= 2) return;
       if (currentInput === '0' && digit === '0') return;
       if (currentInput === '0' && digit !== '0') {
@@ -631,6 +653,11 @@
 
     function backspaceInput() {
       if (!quizActive || quizFinished || answeredCurrent) return;
+      // 退格不需要启动计时（如果已经启动了就算了）
+      if (!quizStarted) {
+        // 如果还没开始，退格不触发计时
+        return;
+      }
       currentInput = currentInput.slice(0, -1);
       refreshInputDisplay();
     }
@@ -667,6 +694,11 @@
       confirmBtn.textContent = '确定';
       confirmBtn.addEventListener('click', (e) => {
         e.preventDefault();
+        // 确定也可以启动计时（如果还没有输入任何数字就点确定，应该无效）
+        if (!quizStarted) {
+          // 没有输入数字，直接忽略提交
+          return;
+        }
         handleSubmit();
       });
       keyboardGrid.appendChild(confirmBtn);
