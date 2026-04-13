@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>🍎 减法口算 · 紧凑版</title>
+  <title>🍎 减法口算 · 差为一位数</title>
   <style>
     * {
       box-sizing: border-box;
@@ -88,7 +88,6 @@
       margin-bottom: 6px;
     }
 
-    /* 题目字体调小 */
     .equation-big {
       text-align: center;
       font-size: 3.2rem;
@@ -177,7 +176,6 @@
       box-shadow: 0 1px 0 #9a8775;
     }
 
-    /* 键盘调小 */
     .keyboard {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -435,10 +433,19 @@
     let questionTimeRecords = [];
     let toastTimer = null;
 
+    // 修改后的题目生成：两位数(11-19)减一位数(1-9)，差必须在1-9之间
     function generateQuestion() {
       const num1 = Math.floor(Math.random() * 9) + 11; // 11~19
-      let num2 = Math.floor(Math.random() * 9) + 1;    // 1~9
-      while (num2 > num1) num2 = Math.floor(Math.random() * 9) + 1;
+      // 计算可能的减数范围：要满足 num1 - num2 在 1~9，即 num2 ∈ [num1-9, num1-1] 且 num2 在1~9之间
+      const minNum2 = Math.max(1, num1 - 9);
+      const maxNum2 = Math.min(9, num1 - 1);
+      let num2;
+      if (minNum2 > maxNum2) {
+        // 如果没有符合条件的，回退到安全值（理论上11-19都应该有解，但以防万一）
+        num2 = Math.max(1, Math.min(9, num1 - 1));
+      } else {
+        num2 = Math.floor(Math.random() * (maxNum2 - minNum2 + 1)) + minNum2;
+      }
       return { num1, num2, answer: num1 - num2 };
     }
 
