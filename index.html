@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>🍎 减法口算 · 均匀一位数结果</title>
+  <title>🍎 减法口算 · 直接开始</title>
   <style>
     * {
       box-sizing: border-box;
@@ -379,7 +379,7 @@
   </div>
 
   <div class="stat-footer">
-    <span id="completionStat">✨ 点击重开开始</span>
+    <span id="completionStat">✨ 点击数字开始答题</span>
     <span>正确率 <span id="accuracySpan">—</span>%</span>
   </div>
 </div>
@@ -422,8 +422,8 @@
     let questions = [];
     let currentIndex = 0;
     let correctCount = 0;
-    let quizActive = false;         // 是否允许答题（重开后为true，但计时未开始）
-    let quizStarted = false;        // 是否已经开始计时（首次按键后）
+    let quizActive = true;          // 初始即可答题
+    let quizStarted = false;        // 计时尚未启动
     let quizFinished = false;
     let answeredCurrent = false;
     let currentInput = '';
@@ -434,17 +434,13 @@
     let questionTimeRecords = [];
     let toastTimer = null;
 
-    // ---------- 优化后的题目生成：保证差为1-9且均匀分布 ----------
+    // ---------- 题目生成：保证差为1-9且均匀分布 ----------
     function generateQuestion() {
-      // 随机生成答案 1~9 (均匀)
-      const answer = Math.floor(Math.random() * 9) + 1;
-      // 随机减数 1~9
-      const num2 = Math.floor(Math.random() * 9) + 1;
-      // 计算被减数，保证在11~19之间
+      const answer = Math.floor(Math.random() * 9) + 1;      // 1~9
+      const num2 = Math.floor(Math.random() * 9) + 1;        // 1~9
       let num1 = answer + num2;
-      // 如果num1超出范围，则调整num2或重新生成（但概率上基本都在范围内，加个保险）
+      // 确保被减数在11~19
       while (num1 < 11 || num1 > 19) {
-        // 重新随机答案和减数
         const newAnswer = Math.floor(Math.random() * 9) + 1;
         const newNum2 = Math.floor(Math.random() * 9) + 1;
         num1 = newAnswer + newNum2;
@@ -496,7 +492,7 @@
     }
 
     function startTotalTimer() {
-      if (quizStarted) return; // 防止重复启动
+      if (quizStarted) return;
       stopTotalTimer();
       quizStarted = true;
       totalTimerInterval = setInterval(() => {
@@ -505,7 +501,6 @@
           updateTotalTimerUI();
         }
       }, 1000);
-      // 开始计时时，标记第一题开始时间（如果尚未标记）
       if (!questionStartTime) {
         markQuestionStart();
       }
@@ -561,7 +556,7 @@
         currentInput = '';
         refreshInputDisplay();
         displayQuestion();
-        markQuestionStart();   // 新题目开始计时
+        markQuestionStart();
         completionStat.textContent = `📋 已完成 ${currentIndex}/10 题`;
       }
     }
@@ -605,6 +600,7 @@
       }
     }
 
+    // 重置（重开）时调用
     function resetAndStart() {
       stopTotalTimer();
       resultModal.classList.remove('show');
@@ -614,11 +610,11 @@
       correctCount = 0;
       quizFinished = false;
       quizActive = true;
-      quizStarted = false;       // 计时尚未开始，等待首次按键
+      quizStarted = false;
       answeredCurrent = false;
       currentInput = '';
       questionTimeRecords = [];
-      questionStartTime = null;   // 开始时间将在首次按键时设定
+      questionStartTime = null;
       
       totalSeconds = 0;
       updateTotalTimerUI();
@@ -626,19 +622,16 @@
       displayQuestion();
       updateScoreUI();
       refreshInputDisplay();
-      completionStat.textContent = `📋 进行中 · 0/10`;
-      
-      // 不启动计时器，等待第一次按键
+      completionStat.textContent = `✨ 点击数字开始答题`;
     }
 
-    // 处理数字输入，如果是首次输入则启动计时
+    // 数字输入：首次输入启动计时
     function appendDigit(digit) {
       if (!quizActive || quizFinished || answeredCurrent) return;
       
-      // 首次按键启动计时
       if (!quizStarted) {
         startTotalTimer();
-        markQuestionStart(); // 记录本题开始时间
+        markQuestionStart();
       }
       
       if (currentInput.length >= 2) return;
@@ -653,11 +646,7 @@
 
     function backspaceInput() {
       if (!quizActive || quizFinished || answeredCurrent) return;
-      // 退格不需要启动计时（如果已经启动了就算了）
-      if (!quizStarted) {
-        // 如果还没开始，退格不触发计时
-        return;
-      }
+      if (!quizStarted) return;  // 未开始时退格无意义
       currentInput = currentInput.slice(0, -1);
       refreshInputDisplay();
     }
@@ -694,11 +683,7 @@
       confirmBtn.textContent = '确定';
       confirmBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        // 确定也可以启动计时（如果还没有输入任何数字就点确定，应该无效）
-        if (!quizStarted) {
-          // 没有输入数字，直接忽略提交
-          return;
-        }
+        if (!quizStarted) return;  // 未输入数字不能提交
         handleSubmit();
       });
       keyboardGrid.appendChild(confirmBtn);
@@ -707,15 +692,22 @@
     function init() {
       buildKeyboard();
       
+      // 初始生成题目并直接可答
       questions = generateSet(10);
       currentIndex = 0;
       correctCount = 0;
-      quizActive = false;
+      quizActive = true;
+      quizStarted = false;
       quizFinished = false;
+      answeredCurrent = false;
+      currentInput = '';
+      questionTimeRecords = [];
+      questionStartTime = null;
+      
       displayQuestion();
       updateScoreUI();
       refreshInputDisplay();
-      completionStat.textContent = '✨ 点击重开开始';
+      completionStat.textContent = '✨ 点击数字开始答题';
       totalSeconds = 0;
       updateTotalTimerUI();
       
