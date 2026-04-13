@@ -3,213 +3,252 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>行测小助手 · 减法</title>
+  <title>🍎 减法口算 · 0居中确定右</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+
     body {
-      background: #2e2a26;
+      background: #ece2d7;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+      font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
       padding: 8px;
       touch-action: manipulation;
     }
+
     .app {
-      max-width: 400px;
+      max-width: 450px;
       width: 100%;
-      background: #1e1b18;
-      border-radius: 36px;
-      padding: 22px 16px 26px;
-      box-shadow: 0 20px 30px rgba(0,0,0,0.5);
-      border: 1px solid #4a4038;
-      color: #f0e7de;
+      background: #fdf8f2;
+      border-radius: 32px;
+      box-shadow: 0 20px 35px rgba(60, 40, 20, 0.15);
+      padding: 18px 14px 22px;
+      border: 1px solid #e2d0be;
     }
 
-    /* 顶部栏：计时 + 重开 */
-    .top-bar {
+    .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
-    }
-    .timer-box {
-      background: #0f0e0c;
-      padding: 8px 16px;
-      border-radius: 40px;
-      font-size: 1.6rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      color: #ffd966;
-      box-shadow: inset 0 0 4px #000, 0 3px 0 #3a322b;
-      border-bottom: 1px solid #6b5d52;
-    }
-    .restart-btn {
-      background: #4a6b5d;
-      border: none;
-      border-radius: 40px;
-      padding: 8px 20px;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: white;
-      box-shadow: 0 4px 0 #2e4239;
-      cursor: pointer;
-      touch-action: manipulation;
-      border: 1px solid #6f8f7d;
-      transition: 0.05s;
-    }
-    .restart-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #2e4239;
+      margin-bottom: 12px;
     }
 
-    /* 正确率/题号 */
-    .info-row {
+    .header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #4a392b;
+    }
+
+    .timer-badge {
+      background: #d6c6b6;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 1.3rem;
+      font-variant-numeric: tabular-nums;
+      color: #2b2018;
+      box-shadow: inset 0 1px 4px #fff8, 0 3px 0 #a48e7a;
+    }
+
+    .score-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 18px;
+      align-items: baseline;
+      margin-bottom: 14px;
+    }
+
+    .progress-text {
+      font-size: 1.1rem;
       font-weight: 600;
-      color: #cbbeb2;
-    }
-    .score-badge {
-      background: #5a4e44;
-      padding: 5px 18px;
-      border-radius: 30px;
-      color: #f2e0c9;
+      color: #6b5542;
     }
 
-    /* 题目卡片 */
-    .question-panel {
-      background: #28221d;
-      border-radius: 32px;
-      padding: 24px 12px 20px;
-      margin-bottom: 20px;
-      box-shadow: inset 0 2px 6px #0a0806, 0 8px 0 #13100e;
-      border-bottom: 2px solid #5f5247;
+    .correct-badge {
+      background: #5f7b6b;
+      color: white;
+      padding: 4px 16px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      box-shadow: 0 3px 0 #3b5547;
     }
-    .equation {
+
+    .question-card {
+      background: #fffbf7;
+      border-radius: 28px;
+      padding: 16px 12px 18px;
+      box-shadow: inset 0 2px 6px #fff, 0 8px 12px -6px rgba(80, 50, 25, 0.1);
+      border: 1px solid #e2cfbc;
+      margin-bottom: 8px;
+    }
+
+    .equation-big {
       text-align: center;
-      font-size: 4.5rem;
+      font-size: 4rem;
       font-weight: 800;
-      color: #f3e5d5;
-      text-shadow: 0 4px 0 #3b3128;
-      margin-bottom: 20px;
-      letter-spacing: 2px;
+      color: #2c221c;
+      line-height: 1.2;
+      margin: 0 0 10px;
+      background: #f3e8de;
+      padding: 10px 4px;
+      border-radius: 40px;
+      box-shadow: inset 0 4px 5px #ddd0c0, 0 5px 0 #b6a18b;
     }
 
-    /* 输入框 + 唤起原生键盘 */
-    .input-section {
+    .input-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 20px;
+      margin: 8px 0 10px;
     }
-    .native-input {
-      flex: 1;
-      background: #0e0c0a;
-      border: 2px solid #5e5349;
+
+    .restart-btn {
+      background: #bc9a7a;
+      color: white;
+      border: none;
       border-radius: 50px;
-      padding: 16px 20px;
+      padding: 12px 16px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      box-shadow: 0 4px 0 #735e4c;
+      cursor: pointer;
+      touch-action: manipulation;
+      border: 1px solid #a58364;
+      transition: 0.05s;
+      white-space: nowrap;
+      min-width: 82px;
+    }
+
+    .restart-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #5f4a38;
+    }
+
+    .input-display {
+      background: #e7dbcf;
+      border-radius: 50px;
+      padding: 8px 18px;
+      flex: 1;
+      box-shadow: inset 0 3px 8px #cdbcab, 0 4px 0 #9e8b78;
+      min-height: 3.8rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-value {
       font-size: 2.4rem;
       font-weight: 700;
-      color: #f0dbb8;
-      text-align: center;
-      box-shadow: inset 0 4px 8px #00000055, 0 4px 0 #2a231e;
-      outline: none;
+      color: #1e1813;
+      letter-spacing: 3px;
       font-variant-numeric: tabular-nums;
-      caret-color: #c9a87c;
-    }
-    .native-input:focus {
-      border-color: #c9a87c;
-      background: #1a1511;
-    }
-    .action-btns {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .small-btn {
-      background: #3d352e;
-      border: none;
-      border-radius: 30px;
-      padding: 12px 14px;
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: #efdbca;
-      box-shadow: 0 3px 0 #221d19;
-      cursor: pointer;
-      touch-action: manipulation;
-      border: 1px solid #695e54;
-      min-width: 70px;
-      transition: 0.05s;
-    }
-    .small-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #221d19;
     }
 
-    /* 确定按钮 */
-    .confirm-btn {
-      width: 100%;
-      background: #7d9f85;
+    .placeholder {
+      color: #7f6e5e;
+      font-size: 1.8rem;
+      opacity: 0.6;
+    }
+
+    .backspace-btn {
+      background: #f1e7de;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 18px;
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #3e3124;
+      box-shadow: 0 4px 0 #ad9a87;
+      cursor: pointer;
+      touch-action: manipulation;
+      border: 1px solid #dacbbb;
+      transition: 0.05s;
+      min-width: 70px;
+    }
+
+    .backspace-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #9a8775;
+    }
+
+    /* 数字键盘网格 */
+    .keyboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .key-btn {
+      background: #ffffff;
       border: none;
       border-radius: 60px;
-      padding: 18px 10px;
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: white;
-      box-shadow: 0 7px 0 #44634e;
+      padding: 16px 4px;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2e241b;
+      box-shadow: 0 5px 0 #b09c88, 0 2px 6px rgba(0,0,0,0.05);
       cursor: pointer;
       touch-action: manipulation;
-      border: 1px solid #a1c0a9;
+      border: 1px solid #ddcdbc;
       transition: 0.05s;
-      margin-bottom: 12px;
-    }
-    .confirm-btn:active {
-      transform: translateY(5px);
-      box-shadow: 0 2px 0 #3a5443;
-    }
-
-    /* 底部进度 */
-    .progress-footer {
       text-align: center;
-      font-size: 1.1rem;
-      color: #b7a99b;
-      font-weight: 500;
     }
 
-    /* 错误弹窗 */
+    .key-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #9b8874;
+    }
+
+    .key-confirm {
+      background: #6d8f7a;
+      color: white;
+      box-shadow: 0 5px 0 #3d5e4c;
+      border-color: #5a7b68;
+    }
+
+    /* 占位按钮：完全透明，不可见，无点击效果 */
+    .key-placeholder {
+      visibility: hidden;
+      pointer-events: none;
+      box-shadow: none;
+      background: transparent;
+      border: 1px solid transparent;
+    }
+
     .toast-popup {
       position: fixed;
       top: 30%;
       left: 50%;
       transform: translate(-50%, -30%);
-      background: #b34a4a;
+      background: #c05a5a;
       color: white;
       font-weight: bold;
-      font-size: 2rem;
-      padding: 16px 36px;
+      font-size: 1.8rem;
+      padding: 16px 32px;
       border-radius: 60px;
-      box-shadow: 0 15px 25px black;
+      box-shadow: 0 20px 30px rgba(0,0,0,0.2);
       z-index: 1000;
       opacity: 0;
       transition: opacity 0.12s;
       pointer-events: none;
       white-space: nowrap;
-      border: 2px solid #ffb4b4;
+      border: 2px solid #ffdab9;
     }
-    .toast-popup.show { opacity: 1; }
 
-    /* 结束模态 */
+    .toast-popup.show {
+      opacity: 1;
+    }
+
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
+      background: rgba(30, 20, 10, 0.5);
       backdrop-filter: blur(4px);
       display: flex;
       align-items: center;
@@ -220,115 +259,141 @@
       transition: 0.2s;
       padding: 16px;
     }
+
     .modal-overlay.show {
       visibility: visible;
       opacity: 1;
     }
+
     .modal-card {
-      background: #2d2722;
-      max-width: 380px;
+      background: #fef7f0;
+      max-width: 400px;
       width: 100%;
       border-radius: 40px;
-      padding: 24px 18px 18px;
-      box-shadow: 0 30px 40px black;
-      border: 1px solid #6a5d52;
-      color: #ede0d4;
+      padding: 22px 18px 20px;
+      box-shadow: 0 30px 40px rgba(0,0,0,0.2);
+      border: 2px solid #d6c0ab;
     }
+
     .modal-title {
-      font-size: 1.9rem;
+      font-size: 1.8rem;
       font-weight: 700;
-      margin-bottom: 16px;
+      color: #3b2c1e;
+      margin-bottom: 15px;
       text-align: center;
     }
+
     .detail-list {
-      max-height: 260px;
+      max-height: 280px;
       overflow-y: auto;
-      margin-bottom: 22px;
-      border-radius: 24px;
-      background: #1f1a16;
+      margin-bottom: 20px;
+      border-radius: 30px;
+      background: #f3e9df;
       padding: 8px 6px;
     }
+
     .detail-item {
       display: flex;
       justify-content: space-between;
       padding: 10px 14px;
       font-size: 1.2rem;
-      border-bottom: 1px solid #4e443c;
+      border-bottom: 1px solid #dacbbc;
+      font-weight: 500;
     }
+
     .time-col {
-      background: #40362f;
-      padding: 4px 14px;
-      border-radius: 30px;
       font-family: monospace;
-      color: #eaceb0;
+      background: #e3d4c4;
+      padding: 3px 10px;
+      border-radius: 30px;
     }
+
     .modal-actions {
       display: flex;
-      gap: 14px;
+      gap: 12px;
+      justify-content: center;
     }
+
     .modal-btn {
       flex: 1;
-      padding: 16px 8px;
+      padding: 14px 8px;
       border-radius: 50px;
       font-weight: 700;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       border: none;
-      box-shadow: 0 5px 0 #2a221d;
+      box-shadow: 0 4px 0 #9b8874;
       cursor: pointer;
-      background: #554a41;
-      color: #f2e0cf;
+      touch-action: manipulation;
+      background: #e1d3c5;
+      color: #2f241b;
+      transition: 0.05s;
+      border: 1px solid #cbb9a7;
     }
+
     .modal-btn.primary {
-      background: #6d8f7a;
+      background: #7a9a83;
       color: white;
-      box-shadow: 0 5px 0 #3d5e4c;
+      box-shadow: 0 4px 0 #486353;
     }
+
     .modal-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 1px 0 #332b25;
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #7f6b58;
+    }
+
+    .stat-footer {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      background: #ddd0c1;
+      padding: 8px 16px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
     }
   </style>
 </head>
 <body>
 <div class="app">
-  <!-- 顶部：计时 + 重开（独立） -->
-  <div class="top-bar">
-    <div class="timer-box" id="timerDisplay">00:00</div>
-    <button class="restart-btn" id="restartBtn">🔄 重开</button>
+  <div class="header">
+    <h2>🧸 减法</h2>
+    <div class="timer-badge" id="timerDisplay">00:00</div>
   </div>
 
-  <!-- 题号 & 正确数 -->
-  <div class="info-row">
-    <span id="questionCounter">第1/10题</span>
-    <span class="score-badge" id="scoreDisplay">✅ 0/10</span>
+  <div class="score-row">
+    <span class="progress-text" id="questionCounter">第1/10题</span>
+    <span class="correct-badge" id="scoreDisplay">✅ 0/10</span>
   </div>
 
-  <!-- 题目区域 -->
-  <div class="question-panel">
-    <div class="equation" id="equationText">15 − 7 = ?</div>
+  <div class="question-card">
+    <div class="equation-big" id="equationText">15 − 7 = ?</div>
 
-    <!-- 输入框（点击唤起原生键盘） + 清空/退格 -->
-    <div class="input-section">
-      <input type="text" inputmode="numeric" id="answerInput" class="native-input" placeholder="—" value="" maxlength="2" autocomplete="off">
-      <div class="action-btns">
-        <button class="small-btn" id="clearBtn">清空</button>
-        <button class="small-btn" id="backspaceBtn">退格</button>
+    <!-- 重开(左侧) + 输入显示条 + 退格(右侧) -->
+    <div class="input-row">
+      <button class="restart-btn" id="restartBtn">🔄 重开</button>
+      <div class="input-display">
+        <div class="input-value" id="inputDisplay"><span class="placeholder">—</span></div>
       </div>
+      <button class="backspace-btn" id="backspaceBtn" title="退格">←</button>
     </div>
 
-    <!-- 确定按钮 -->
-    <button class="confirm-btn" id="submitBtn">✅ 确定</button>
-    <div class="progress-footer" id="completionStat">✨ 点击重开开始</div>
+    <!-- 数字键盘：1-9，占位，0，确定 -->
+    <div class="keyboard" id="keyboardGrid"></div>
+  </div>
+
+  <div class="stat-footer">
+    <span id="completionStat">✨ 点击重开开始</span>
+    <span>正确率 <span id="accuracySpan">—</span>%</span>
   </div>
 </div>
 
 <!-- 错误弹窗 -->
 <div class="toast-popup" id="errorToast">❌ 答错了</div>
 
-<!-- 完成模态 -->
+<!-- 结果模态框 -->
 <div class="modal-overlay" id="resultModal">
   <div class="modal-card">
-    <div class="modal-title">📋 答题详情</div>
+    <div class="modal-title">📋 练习报告</div>
     <div class="detail-list" id="detailList"></div>
     <div class="modal-actions">
       <button class="modal-btn primary" id="modalRestart">🔄 重开</button>
@@ -341,30 +406,29 @@
   (function(){
     "use strict";
 
-    // DOM
     const timerDisplay = document.getElementById('timerDisplay');
     const scoreDisplay = document.getElementById('scoreDisplay');
     const questionCounter = document.getElementById('questionCounter');
     const equationText = document.getElementById('equationText');
-    const answerInput = document.getElementById('answerInput');
-    const clearBtn = document.getElementById('clearBtn');
+    const inputDisplay = document.getElementById('inputDisplay');
     const backspaceBtn = document.getElementById('backspaceBtn');
-    const submitBtn = document.getElementById('submitBtn');
     const restartBtn = document.getElementById('restartBtn');
     const completionStat = document.getElementById('completionStat');
+    const accuracySpan = document.getElementById('accuracySpan');
     const errorToast = document.getElementById('errorToast');
+    const keyboardGrid = document.getElementById('keyboardGrid');
     const resultModal = document.getElementById('resultModal');
     const detailList = document.getElementById('detailList');
     const modalRestart = document.getElementById('modalRestart');
     const modalClose = document.getElementById('modalClose');
 
-    // 状态
     let questions = [];
     let currentIndex = 0;
     let correctCount = 0;
     let quizActive = false;
     let quizFinished = false;
     let answeredCurrent = false;
+    let currentInput = '';
     
     let totalTimerInterval = null;
     let totalSeconds = 0;
@@ -372,17 +436,20 @@
     let questionTimeRecords = [];
     let toastTimer = null;
 
-    // 生成题目 (10-19 减 1-9)
+    // 生成题目 (11-19 减 1-9)
     function generateQuestion() {
-      const num1 = Math.floor(Math.random() * 10) + 10;
-      let num2 = Math.floor(Math.random() * 9) + 1;
+      const num1 = Math.floor(Math.random() * 9) + 11; // 11~19
+      let num2 = Math.floor(Math.random() * 9) + 1;    // 1~9
       while (num2 > num1) num2 = Math.floor(Math.random() * 9) + 1;
       return { num1, num2, answer: num1 - num2 };
     }
-    function generateSet(count=10) { return Array.from({length:count}, generateQuestion); }
+
+    function generateSet(count = 10) {
+      return Array.from({ length: count }, generateQuestion);
+    }
 
     function displayQuestion() {
-      if (!questions.length) return;
+      if (!questions.length || currentIndex >= questions.length) return;
       const q = questions[currentIndex];
       equationText.textContent = `${q.num1} − ${q.num2} = ?`;
       questionCounter.textContent = `第${currentIndex+1}/10题`;
@@ -390,49 +457,82 @@
 
     function updateScoreUI() {
       scoreDisplay.textContent = `✅ ${correctCount}/10`;
+      const acc = (correctCount / 10) * 100;
+      accuracySpan.textContent = (acc % 1 === 0 ? acc.toFixed(0) : acc.toFixed(1));
+    }
+
+    function refreshInputDisplay() {
+      if (currentInput === '') {
+        inputDisplay.innerHTML = '<span class="placeholder">—</span>';
+      } else {
+        inputDisplay.textContent = currentInput;
+      }
     }
 
     function formatTime(sec) {
-      const m = Math.floor(sec/60).toString().padStart(2,'0');
-      const s = (sec%60).toString().padStart(2,'0');
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = (sec % 60).toString().padStart(2, '0');
       return `${m}:${s}`;
     }
 
-    function updateTimerUI() { timerDisplay.textContent = formatTime(totalSeconds); }
-    function stopTotalTimer() { if(totalTimerInterval) clearInterval(totalTimerInterval); totalTimerInterval=null; }
+    function updateTotalTimerUI() {
+      timerDisplay.textContent = formatTime(totalSeconds);
+    }
+
+    function stopTotalTimer() {
+      if (totalTimerInterval) clearInterval(totalTimerInterval);
+      totalTimerInterval = null;
+    }
+
     function startTotalTimer() {
       stopTotalTimer();
       totalTimerInterval = setInterval(() => {
-        if (quizActive && !quizFinished) { totalSeconds++; updateTimerUI(); }
+        if (quizActive && !quizFinished) {
+          totalSeconds++;
+          updateTotalTimerUI();
+        }
       }, 1000);
     }
 
-    function markQuestionStart() { questionStartTime = Date.now(); }
-    function getQuestionElapsed() {
-      if(!questionStartTime) return 0;
-      return Math.round((Date.now() - questionStartTime)/1000 *10)/10;
+    function markQuestionStart() {
+      questionStartTime = Date.now();
+    }
+
+    function getQuestionElapsedSeconds() {
+      if (!questionStartTime) return 0;
+      const elapsed = (Date.now() - questionStartTime) / 1000;
+      return Math.round(elapsed * 10) / 10;
     }
 
     function showErrorToast() {
-      if(toastTimer) clearTimeout(toastTimer);
+      if (toastTimer) clearTimeout(toastTimer);
       errorToast.classList.add('show');
-      toastTimer = setTimeout(() => errorToast.classList.remove('show'), 150);
+      toastTimer = setTimeout(() => {
+        errorToast.classList.remove('show');
+      }, 150);
     }
 
     function finishQuizAndShowModal() {
-      quizFinished = true; quizActive = false; stopTotalTimer();
-      const accuracy = (correctCount/10)*100;
-      const accStr = accuracy%1===0 ? accuracy.toFixed(0) : accuracy.toFixed(1);
-      completionStat.textContent = `🏁 正确率 ${accStr}% · 总用时 ${formatTime(totalSeconds)}`;
+      quizFinished = true;
+      quizActive = false;
+      stopTotalTimer();
+      
+      const accuracy = (correctCount / 10) * 100;
+      const accStr = accuracy % 1 === 0 ? accuracy.toFixed(0) : accuracy.toFixed(1);
+      completionStat.textContent = `🏁 完成 · 正确率 ${accStr}% · 总用时 ${formatTime(totalSeconds)}`;
       
       detailList.innerHTML = '';
-      questionTimeRecords.forEach((rec, idx) => {
-        const div = document.createElement('div'); div.className='detail-item';
-        const q = rec.question;
-        div.innerHTML = `<span>${idx+1}. ${q.num1}−${q.num2}=${q.answer} ${rec.isCorrect?'✅':'❌'}</span>
-                         <span class="time-col">${rec.timeSpent.toFixed(1)}秒</span>`;
-        detailList.appendChild(div);
+      questionTimeRecords.forEach((record, idx) => {
+        const item = document.createElement('div');
+        item.className = 'detail-item';
+        const q = record.question;
+        const isCorrect = record.isCorrect;
+        const timeSpent = record.timeSpent.toFixed(1);
+        item.innerHTML = `<span>${idx+1}.  ${q.num1} − ${q.num2} = ${q.answer}  ${isCorrect ? '✅' : '❌'}</span>
+                          <span class="time-col">${timeSpent}秒</span>`;
+        detailList.appendChild(item);
       });
+      
       resultModal.classList.add('show');
     }
 
@@ -440,91 +540,165 @@
       if (currentIndex < 9) {
         currentIndex++;
         answeredCurrent = false;
-        answerInput.value = '';
+        currentInput = '';
+        refreshInputDisplay();
         displayQuestion();
         markQuestionStart();
         completionStat.textContent = `📋 已完成 ${currentIndex}/10 题`;
-        answerInput.focus();
       }
     }
 
     function handleSubmit() {
       if (!quizActive || quizFinished || answeredCurrent) return;
-      const val = answerInput.value.trim();
-      if (val === '') return;
-      const userAnswer = Number(val);
+      
+      const inputVal = currentInput.trim();
+      if (inputVal === '') return;
+      const userAnswer = Number(inputVal);
       if (isNaN(userAnswer) || !Number.isInteger(userAnswer) || userAnswer < 0) {
-        answerInput.value = ''; return;
+        currentInput = '';
+        refreshInputDisplay();
+        return;
       }
       
       const q = questions[currentIndex];
       const isCorrect = (userAnswer === q.answer);
-      const timeSpent = getQuestionElapsed();
-      questionTimeRecords[currentIndex] = { question: q, isCorrect, timeSpent };
+      const timeSpent = getQuestionElapsedSeconds();
+      
+      questionTimeRecords[currentIndex] = {
+        question: q,
+        isCorrect: isCorrect,
+        timeSpent: timeSpent
+      };
+      
       answeredCurrent = true;
       
-      if (isCorrect) { correctCount++; updateScoreUI(); }
-      else { showErrorToast(); }
+      if (isCorrect) {
+        correctCount++;
+        updateScoreUI();
+      } else {
+        showErrorToast();
+      }
       
-      if (currentIndex === 9) { finishQuizAndShowModal(); }
-      else { goToNextQuestion(); }
-    }
-
-    function resetAndStart() {
-      stopTotalTimer(); resultModal.classList.remove('show');
-      questions = generateSet(10);
-      currentIndex = 0; correctCount = 0; quizFinished = false; quizActive = true;
-      answeredCurrent = false; questionTimeRecords = [];
-      totalSeconds = 0; updateTimerUI();
-      
-      displayQuestion(); updateScoreUI();
-      answerInput.value = ''; answerInput.disabled = false;
-      completionStat.textContent = `📋 进行中 · 0/10`;
-      markQuestionStart(); startTotalTimer();
-      answerInput.focus();
-    }
-
-    // 清空输入
-    function clearInput() { if(quizActive&&!quizFinished&&!answeredCurrent) { answerInput.value = ''; answerInput.focus(); } }
-    // 退格
-    function backspaceInput() {
-      if(quizActive&&!quizFinished&&!answeredCurrent) {
-        answerInput.value = answerInput.value.slice(0,-1);
-        answerInput.focus();
+      if (currentIndex === 9) {
+        finishQuizAndShowModal();
+        return;
+      } else {
+        goToNextQuestion();
       }
     }
 
-    // 初始化
-    function init() {
-      // 初始未激活
+    function resetAndStart() {
+      stopTotalTimer();
+      resultModal.classList.remove('show');
+      
       questions = generateSet(10);
-      displayQuestion(); updateScoreUI();
-      quizActive = false; quizFinished = false;
-      completionStat.textContent = '✨ 点击重开开始';
-      answerInput.disabled = true;
+      currentIndex = 0;
+      correctCount = 0;
+      quizFinished = false;
+      quizActive = true;
+      answeredCurrent = false;
+      currentInput = '';
+      questionTimeRecords = [];
       
-      clearBtn.addEventListener('click', clearInput);
-      backspaceBtn.addEventListener('click', backspaceInput);
-      submitBtn.addEventListener('click', handleSubmit);
-      restartBtn.addEventListener('click', resetAndStart);
-      modalRestart.addEventListener('click', resetAndStart);
-      modalClose.addEventListener('click', ()=> resultModal.classList.remove('show'));
+      totalSeconds = 0;
+      updateTotalTimerUI();
       
-      // 限制只能输入数字
-      answerInput.addEventListener('input', function(e) {
-        this.value = this.value.replace(/[^0-9]/g, '');
-        if (this.value.length > 2) this.value = this.value.slice(0,2);
+      displayQuestion();
+      updateScoreUI();
+      refreshInputDisplay();
+      completionStat.textContent = `📋 进行中 · 0/10`;
+      
+      markQuestionStart();
+      startTotalTimer();
+    }
+
+    function appendDigit(digit) {
+      if (!quizActive || quizFinished || answeredCurrent) return;
+      if (currentInput.length >= 2) return;
+      if (currentInput === '0' && digit === '0') return;
+      if (currentInput === '0' && digit !== '0') {
+        currentInput = digit;
+      } else {
+        currentInput += digit;
+      }
+      refreshInputDisplay();
+    }
+
+    function backspaceInput() {
+      if (!quizActive || quizFinished || answeredCurrent) return;
+      currentInput = currentInput.slice(0, -1);
+      refreshInputDisplay();
+    }
+
+    // 构建键盘：1-9，占位，0，确定
+    function buildKeyboard() {
+      const digits = ['1','2','3','4','5','6','7','8','9'];
+      keyboardGrid.innerHTML = '';
+      
+      digits.forEach(d => {
+        const btn = document.createElement('button');
+        btn.classList.add('key-btn');
+        btn.textContent = d;
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          appendDigit(d);
+        });
+        keyboardGrid.appendChild(btn);
       });
       
-      // 激活时启用输入框
-      const originalReset = resetAndStart;
-      window.resetAndStart = function() {
-        answerInput.disabled = false;
-        originalReset();
-      };
-      // 绑定修正
-      restartBtn.onclick = ()=> { answerInput.disabled = false; resetAndStart(); };
-      modalRestart.onclick = ()=> { answerInput.disabled = false; resetAndStart(); };
+      // 占位按钮（透明不可见）
+      const placeholderBtn = document.createElement('button');
+      placeholderBtn.classList.add('key-btn', 'key-placeholder');
+      placeholderBtn.textContent = '';
+      placeholderBtn.disabled = true;
+      keyboardGrid.appendChild(placeholderBtn);
+      
+      // 0 按钮
+      const btn0 = document.createElement('button');
+      btn0.classList.add('key-btn');
+      btn0.textContent = '0';
+      btn0.addEventListener('click', () => appendDigit('0'));
+      keyboardGrid.appendChild(btn0);
+      
+      // 确定按钮
+      const confirmBtn = document.createElement('button');
+      confirmBtn.classList.add('key-btn', 'key-confirm');
+      confirmBtn.textContent = '确定';
+      confirmBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        handleSubmit();
+      });
+      keyboardGrid.appendChild(confirmBtn);
+    }
+
+    function init() {
+      buildKeyboard();
+      
+      questions = generateSet(10);
+      currentIndex = 0;
+      correctCount = 0;
+      quizActive = false;
+      quizFinished = false;
+      displayQuestion();
+      updateScoreUI();
+      refreshInputDisplay();
+      completionStat.textContent = '✨ 点击重开开始';
+      totalSeconds = 0;
+      updateTotalTimerUI();
+      
+      backspaceBtn.addEventListener('click', backspaceInput);
+      
+      restartBtn.addEventListener('click', () => {
+        resetAndStart();
+      });
+      
+      modalRestart.addEventListener('click', () => {
+        resetAndStart();
+      });
+      
+      modalClose.addEventListener('click', () => {
+        resultModal.classList.remove('show');
+      });
     }
 
     init();
