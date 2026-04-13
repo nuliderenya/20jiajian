@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>🍎 减法口算 · 直接开始</title>
+  <title>🍎 减法口算 · 紧凑顶部</title>
   <style>
     * {
       box-sizing: border-box;
@@ -32,28 +32,67 @@
       border: 1px solid #e2d0be;
     }
 
+    /* 顶部行：标题 + 数量切换 + 计时器 */
     .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .header h2 {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: 700;
       color: #4a392b;
+      white-space: nowrap;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .count-group {
+      display: flex;
+      gap: 4px;
+      background: #e7dbcf;
+      padding: 3px;
+      border-radius: 40px;
+      box-shadow: inset 0 1px 3px #cdbcab;
+    }
+
+    .count-btn {
+      background: transparent;
+      border: none;
+      border-radius: 30px;
+      padding: 5px 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #4a392b;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: 0.1s;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .count-btn.active {
+      background: #a58365;
+      color: white;
+      box-shadow: 0 2px 0 #5f4a38;
     }
 
     .timer-badge {
       background: #d6c6b6;
-      padding: 5px 12px;
+      padding: 5px 10px;
       border-radius: 40px;
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-variant-numeric: tabular-nums;
       color: #2b2018;
       box-shadow: inset 0 1px 4px #fff8, 0 3px 0 #a48e7a;
+      white-space: nowrap;
     }
 
     .score-row {
@@ -354,9 +393,17 @@
 </head>
 <body>
 <div class="app">
+  <!-- 顶部：标题 + 数量切换 + 计时器 同行 -->
   <div class="header">
     <h2>🧸 减法</h2>
-    <div class="timer-badge" id="timerDisplay">00:00</div>
+    <div class="header-right">
+      <div class="count-group">
+        <button class="count-btn active" data-count="10">10</button>
+        <button class="count-btn" data-count="20">20</button>
+        <button class="count-btn" data-count="30">30</button>
+      </div>
+      <div class="timer-badge" id="timerDisplay">00:00</div>
+    </div>
   </div>
 
   <div class="score-row">
@@ -418,15 +465,17 @@
     const detailList = document.getElementById('detailList');
     const modalRestart = document.getElementById('modalRestart');
     const modalClose = document.getElementById('modalClose');
+    const countBtns = document.querySelectorAll('.count-btn');
 
     let questions = [];
     let currentIndex = 0;
     let correctCount = 0;
-    let quizActive = true;          // 初始即可答题
-    let quizStarted = false;        // 计时尚未启动
+    let quizActive = true;
+    let quizStarted = false;
     let quizFinished = false;
     let answeredCurrent = false;
     let currentInput = '';
+    let questionCount = 10;
     
     let totalTimerInterval = null;
     let totalSeconds = 0;
@@ -434,12 +483,10 @@
     let questionTimeRecords = [];
     let toastTimer = null;
 
-    // ---------- 题目生成：保证差为1-9且均匀分布 ----------
     function generateQuestion() {
-      const answer = Math.floor(Math.random() * 9) + 1;      // 1~9
-      const num2 = Math.floor(Math.random() * 9) + 1;        // 1~9
+      const answer = Math.floor(Math.random() * 9) + 1;
+      const num2 = Math.floor(Math.random() * 9) + 1;
       let num1 = answer + num2;
-      // 确保被减数在11~19
       while (num1 < 11 || num1 > 19) {
         const newAnswer = Math.floor(Math.random() * 9) + 1;
         const newNum2 = Math.floor(Math.random() * 9) + 1;
@@ -451,7 +498,7 @@
       return { num1, num2, answer };
     }
 
-    function generateSet(count = 10) {
+    function generateSet(count) {
       return Array.from({ length: count }, generateQuestion);
     }
 
@@ -459,12 +506,12 @@
       if (!questions.length || currentIndex >= questions.length) return;
       const q = questions[currentIndex];
       equationText.textContent = `${q.num1} − ${q.num2} = ?`;
-      questionCounter.textContent = `第${currentIndex+1}/10题`;
+      questionCounter.textContent = `第${currentIndex+1}/${questionCount}题`;
     }
 
     function updateScoreUI() {
-      scoreDisplay.textContent = `✅ ${correctCount}/10`;
-      const acc = (correctCount / 10) * 100;
+      scoreDisplay.textContent = `✅ ${correctCount}/${questionCount}`;
+      const acc = (correctCount / questionCount) * 100;
       accuracySpan.textContent = (acc % 1 === 0 ? acc.toFixed(0) : acc.toFixed(1));
     }
 
@@ -530,7 +577,7 @@
       quizStarted = false;
       stopTotalTimer();
       
-      const accuracy = (correctCount / 10) * 100;
+      const accuracy = (correctCount / questionCount) * 100;
       const accStr = accuracy % 1 === 0 ? accuracy.toFixed(0) : accuracy.toFixed(1);
       completionStat.textContent = `🏁 完成 · 正确率 ${accStr}% · 总用时 ${formatTime(totalSeconds)}`;
       
@@ -550,14 +597,14 @@
     }
 
     function goToNextQuestion() {
-      if (currentIndex < 9) {
+      if (currentIndex < questionCount - 1) {
         currentIndex++;
         answeredCurrent = false;
         currentInput = '';
         refreshInputDisplay();
         displayQuestion();
         markQuestionStart();
-        completionStat.textContent = `📋 已完成 ${currentIndex}/10 题`;
+        completionStat.textContent = `📋 已完成 ${currentIndex}/${questionCount} 题`;
       }
     }
 
@@ -592,7 +639,7 @@
         showErrorToast();
       }
       
-      if (currentIndex === 9) {
+      if (currentIndex === questionCount - 1) {
         finishQuizAndShowModal();
         return;
       } else {
@@ -600,12 +647,12 @@
       }
     }
 
-    // 重置（重开）时调用
-    function resetAndStart() {
+    function resetWithCount(newCount) {
+      questionCount = newCount;
       stopTotalTimer();
       resultModal.classList.remove('show');
       
-      questions = generateSet(10);
+      questions = generateSet(questionCount);
       currentIndex = 0;
       correctCount = 0;
       quizFinished = false;
@@ -623,9 +670,17 @@
       updateScoreUI();
       refreshInputDisplay();
       completionStat.textContent = `✨ 点击数字开始答题`;
+      
+      countBtns.forEach(btn => {
+        const count = parseInt(btn.dataset.count);
+        if (count === questionCount) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
     }
 
-    // 数字输入：首次输入启动计时
     function appendDigit(digit) {
       if (!quizActive || quizFinished || answeredCurrent) return;
       
@@ -646,7 +701,7 @@
 
     function backspaceInput() {
       if (!quizActive || quizFinished || answeredCurrent) return;
-      if (!quizStarted) return;  // 未开始时退格无意义
+      if (!quizStarted) return;
       currentInput = currentInput.slice(0, -1);
       refreshInputDisplay();
     }
@@ -683,7 +738,7 @@
       confirmBtn.textContent = '确定';
       confirmBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        if (!quizStarted) return;  // 未输入数字不能提交
+        if (!quizStarted) return;
         handleSubmit();
       });
       keyboardGrid.appendChild(confirmBtn);
@@ -692,8 +747,8 @@
     function init() {
       buildKeyboard();
       
-      // 初始生成题目并直接可答
-      questions = generateSet(10);
+      questionCount = 10;
+      questions = generateSet(questionCount);
       currentIndex = 0;
       correctCount = 0;
       quizActive = true;
@@ -714,15 +769,23 @@
       backspaceBtn.addEventListener('click', backspaceInput);
       
       restartBtn.addEventListener('click', () => {
-        resetAndStart();
+        resetWithCount(questionCount);
       });
       
       modalRestart.addEventListener('click', () => {
-        resetAndStart();
+        resetWithCount(questionCount);
       });
       
       modalClose.addEventListener('click', () => {
         resultModal.classList.remove('show');
+      });
+      
+      countBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const newCount = parseInt(btn.dataset.count);
+          if (newCount === questionCount) return;
+          resetWithCount(newCount);
+        });
       });
     }
 
